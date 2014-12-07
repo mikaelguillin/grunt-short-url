@@ -36,6 +36,12 @@
     "grunt": "~0.4.5"
   },
   "keywords": [
-    "gruntplugin"
-  ]
+    "gruntplugin",
+    "url",
+    "short"
+  ],
+  "dependencies": {
+    "cheerio": "~0.18.0",
+    "short-url": "0.0.1"
+  }
 }

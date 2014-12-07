@@ -1,6 +1,6 @@
-# grunt-short-url
+# grunt-short-url [![Build Status](https://travis-ci.org/mikaelguillin/grunt-short-url.svg?branch=master)](https://travis-ci.org/mikaelguillin/grunt-short-url)
 
-> URL shortener
+> Simple grunt plugin for shortening href URLs in HTML files
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
@@ -17,73 +17,65 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-short-url');
 ```
 
-## The "short_url" task
+## The "shorturl" task
 
-### Overview
-In your project's Gruntfile, add a section named `short_url` to the data object passed into `grunt.initConfig()`.
-
-```js
-grunt.initConfig({
-  short_url: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
-});
-```
+This grunt task uses google's shortener api for shorten URLs.
 
 ### Options
 
-#### options.separator
-Type: `String`
-Default value: `',  '`
+#### html
+Type: `Object`  
+Default: 
+```
+{
+  'a[href]': 'href',
+  'img[src]': 'src',
+  'link[rel=stylesheet]': 'href',
+  'script[src]': 'src'
+}
+```
 
-A string value that is used to do something with whatever.
-
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
-
-A string value that is used to do something else with whatever else.
+Any HTML element matching these CSS selectors will have their attribute, specified in value, shortened.
 
 ### Usage Examples
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
-
 ```js
 grunt.initConfig({
-  short_url: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
+  shorturl: {
+    yourTarget: {
+      options:
+      {
+        html: {
+          'a[href]': 'href',
+          'img[src]': 'src',
+        }
+      },
+
+      // HTML files
+      files:
+      [{
+        src: 'src/*.html',
+        dest: 'dest/'
+      }]
+    }
+  }
 });
 ```
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom options</title>
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+</head>
+<body>
+  <img src="http://goo.gl/5P0K0K" alt="">
 
-```js
-grunt.initConfig({
-  short_url: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
+  <a href="http://goo.gl/rU0VuC">github.com/mikaelguillin/grunt-short-url</a>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</body>
+</html>
 ```
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-
-## Release History
-_(Nothing yet)_
