@@ -1,6 +1,6 @@
 # grunt-short-url [![Build Status](https://travis-ci.org/mikaelguillin/grunt-short-url.svg?branch=master)](https://travis-ci.org/mikaelguillin/grunt-short-url)
 
-> Simple grunt plugin for shortening href URLs in HTML files
+> Simple grunt plugin for shortening URLs in HTML files
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`

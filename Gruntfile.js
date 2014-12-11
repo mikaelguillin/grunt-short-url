@@ -30,6 +30,14 @@ module.exports = function(grunt) {
 
     // Configuration to be run (and then tested).
     shorturl: {
+      options: {
+        // Use your own keys
+        bitly: {
+          client_id: '824bf51216575337a41a561b28cbd30e74da7750',
+          client_secret: '35b8ffe1602dbc431743fa65009d7065abe67af9',
+          access_token: '673f19deaa01e0939b783b56ff783a25dc2ce72b'
+        }
+      },
       default_options: {
         files: {
           'tmp/default_options.html': ['test/fixtures/default_options.html']
