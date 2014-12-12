@@ -19,9 +19,23 @@ grunt.loadNpmTasks('grunt-short-url');
 
 ## The "shorturl" task
 
-This grunt task uses google's shortener api for shorten URLs.
+This grunt task uses bitly's api for shortening URLs.
 
 ### Options
+
+#### bitly
+Type: `Object`
+```
+{
+  username: 'your username',
+  password: 'your password',
+  client_id: 'your client id',
+  client_secret: 'your client secret'
+}
+```
+
+If you know your access token, you can add `access_token: 'your access token'` and remove the username and password properties.
+
 
 #### html
 Type: `Object`  
@@ -45,6 +59,12 @@ grunt.initConfig({
     yourTarget: {
       options:
       {
+        bitly: {
+          username: 'your username',
+          password: 'your password',
+          client_id: 'your client id',
+          client_secret: 'your client secret'
+        },
         html: {
           'a[href]': 'href',
           'img[src]': 'src',
@@ -60,22 +80,4 @@ grunt.initConfig({
     }
   }
 });
-```
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Custom options</title>
-  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-</head>
-<body>
-  <img src="http://goo.gl/5P0K0K" alt="">
-
-  <a href="http://goo.gl/rU0VuC">github.com/mikaelguillin/grunt-short-url</a>
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-</body>
-</html>
 ```
