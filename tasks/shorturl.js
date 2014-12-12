@@ -11,7 +11,6 @@
 var async = require('async');
 var cheerio = require('cheerio');
 var Bitly = require('node-bitlyapi');
-var Cache = require('mem-cache');
 
 var htmlDefaults = {
   'img[src]': 'src',
@@ -62,82 +61,58 @@ module.exports = function(grunt) {
         var $ = cheerio.load(grunt.file.read(srcFile));
         var html = options.html;
         var htmlArray = [];
-        var elemsTagsShortened = 0;
-            var cache = new Cache();
+        var urlsShortened = 0;
         var bitly = new Bitly({
           client_id: options.bitly.client_id,
           client_secret: options.bitly.client_secret
         });
 
         // Shortens for each selector
-        var shortenElemTypes = function(elemType, callbackType) {
+        var shortenSelector = function(selector, callbackSelector) {
 
-          var elemsTags = $(elemType).toArray();
-          var elemsTagsNb = elemsTags.length;
-          var i = 0;
+          var $selector = $(selector);
+          var attrType = html[selector];
+          var urls = [];
 
-          async.eachLimit(elemsTags, 5, function(elemTag, callbackTags) {
+          // Fetches urls to shorten
+          $selector.each(function() {
 
-            var $elemTag = $(elemTag);
-            var attrType = html[elemType];
-            var attrVal = $elemTag.attr(attrType);
+            var elem = $(this);
+            var attrVal = elem.attr(attrType);
 
-            // If URL is already shortened
-            if(cache.get(attrVal)) {
-              $elemTag.attr(attrType, cache.get(attrVal));
-
-              elemsTagsShortened++;
-              i++;
-
-                callbackTags();
-
-                if(i === elemsTagsNb) {
-                callbackType();
-              }
+            if(urls.indexOf(attrVal) === -1) {
+              urls.push(attrVal);
             }
-            // Otherwise, bitly shortens URL
-            else {
-
-              bitly.shortenLink(attrVal, function(err, response) {
-
-                  if(err) {
-                    grunt.fail.fatal(err);
-                  }
-
-                  var response = JSON.parse(response);
-                  var bitlyURL = response.data.url;
-                  var longUrl = response.data.long_url;
-
-                  if(bitlyURL) {
-                    cache.set(longUrl, bitlyURL);
-                    $elemTag.attr(attrType, bitlyURL);
-                    elemsTagsShortened++;
-                  }
-
-                  i++;
-
-                  callbackTags();
-
-                  if(i === elemsTagsNb) {
-                  callbackType();
-                }
-                });
-              }
           });
-        };
 
-        // Init shortenings
-        var initShortenings = function() {
+          // Shortens each urls
+          async.eachLimit(urls, 5, function(url, callbackLoop) {
 
-          for(var key in html) {
-            if($(key).length > 0) {
-              htmlArray.push(key); 
-            }
-          }
+            bitly.shortenLink(url, function(err, response) {
 
-          async.eachSeries(htmlArray, function(elem, callback) {
+              if(err) {
+                grunt.fail.fatal(err);
+              }
 
-            shortenElemTypes(elem, callback);
+              var response = JSON.parse(response);
+              var bitlyURL = response.data.url;
+              var longUrl = response.data.long_url;
+
+              if(bitlyURL) {
+                urlsShortened++;
+
+                // Filters elements by their long url
+                $selector.filter(function() {
+
+                  return $(this).attr(attrType) === longUrl;
+                
+                })
+                // and replaces it by short url
+                .attr(attrType, bitlyURL);
+              }
+
+              callbackLoop();
+            });
 
           }, function(err) {
 
@@ -145,7 +120,32 @@ module.exports = function(grunt) {
               grunt.fail.fatal(err);
             }
 
-            grunt.log.writeln(elemsTagsShortened + ' URLs shortened');
+            callbackSelector();
+          });
+        };
+
+        // Init shortenings
+        var initShortenings = function() {
+
+          // Stores only existing elements in htmlArray
+          for(var key in html) {
+            if($(key).length > 0) {
+              htmlArray.push(key);
+            }
+          }
+
+          // Shortening for each selector
+          async.eachSeries(htmlArray, function(selector, callback) {
+
+            shortenSelector(selector, callback);
+
+          },function(err) {
+
+            if(err) {
+              grunt.fail.fatal(err);
+            }
+
+            grunt.log.writeln(urlsShortened + ' URLs shortened');
             grunt.file.write(destFile, $.html());
             grunt.log.writeln('File "' + destFile + '" created.');
             done();
