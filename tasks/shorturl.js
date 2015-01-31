@@ -96,7 +96,6 @@ module.exports = function(grunt) {
 
               var response = JSON.parse(response);
               var bitlyURL = response.data.url;
-              var longUrl = response.data.long_url;
 
               if(bitlyURL) {
                 urlsShortened++;
@@ -104,7 +103,7 @@ module.exports = function(grunt) {
                 // Filters elements by their long url
                 $selector.filter(function() {
 
-                  return $(this).attr(attrType) === longUrl;
+                  return $(this).attr(attrType) === url;
                 
                 })
                 // and replaces it by short url
