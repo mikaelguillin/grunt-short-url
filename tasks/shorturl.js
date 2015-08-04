@@ -58,7 +58,7 @@ module.exports = function(grunt) {
       }
       else {
 
-        var $ = cheerio.load(grunt.file.read(srcFile));
+        var $ = cheerio.load(grunt.file.read(srcFile), {decodeEntities: false});
         var html = options.html;
         var htmlArray = [];
         var urlsShortened = 0;
